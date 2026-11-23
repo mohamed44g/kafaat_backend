@@ -4,14 +4,25 @@
 
 ## أول تشغيل أو تحديث
 
+نفّذ الأوامر بحساب `kafaat` (أو أضف `sudo -u kafaat` قبل أوامر PM2 وnpm عند الدخول بحساب `root`).
+
 ```bash
-cd /opt/kafaat/backend && npm ci && npm run build
-cd /opt/kafaat/frontend && npm ci && npm run build
+cd /opt/kafaat/backend && git pull && npm ci && npm run build
+cd /opt/kafaat/frontend && git pull && npm ci && npm run build
+
+# Next standalone لا ينسخ public و static تلقائياً
+cd /opt/kafaat/frontend
+rm -rf .next/standalone/public .next/standalone/.next/static
+cp -r public .next/standalone/public
+mkdir -p .next/standalone/.next
+cp -r .next/static .next/standalone/.next/static
 
 cd /opt/kafaat/backend
 pm2 startOrReload ecosystem.config.cjs --update-env
 pm2 save
 ```
+
+تم تفعيل خدمة `pm2-kafaat` في systemd؛ لذلك ستعود التطبيقات تلقائياً بعد إعادة تشغيل الـVPS.
 
 ## إدارة الخدمات
 
