@@ -35,7 +35,7 @@ Edit the generated `.env`. Keep the generated XMPP/Jicofo/JVB passwords unchange
 ```ini
 CONFIG=~/.jitsi-meet-cfg
 PUBLIC_URL=https://meet.example.com
-TZ=Africa/Kuwait
+TZ=Asia/Kuwait
 
 ENABLE_LETSENCRYPT=1
 LETSENCRYPT_DOMAIN=meet.example.com
