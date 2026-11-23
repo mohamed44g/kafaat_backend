@@ -30,7 +30,6 @@ services:
     build:
       context: ../frontend
     restart: unless-stopped
-    env_file: .env.production
     environment:
       BACKEND_API_URL: http://backend:3001/api/v1
     depends_on:
