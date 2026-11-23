@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS user_video_progress;
+DROP TABLE IF EXISTS subscriptions;
+DROP TABLE IF EXISTS bunny_webhook_events;
+DROP TABLE IF EXISTS videos;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS instructors;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS subscription_provider_enum;
+DROP TYPE IF EXISTS subscription_status_enum;
+DROP TYPE IF EXISTS user_role_enum;

@@ -1,0 +1,47 @@
+name: kafaat
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env.production
+    volumes:
+      - kafaat_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [private]
+
+  backend:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file: .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3001"
+    networks: [private]
+
+  frontend:
+    build:
+      context: ../frontend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      BACKEND_API_URL: http://backend:3001/api/v1
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks: [private]
+
+networks:
+  private:
+    driver: bridge
+
+volumes:
+  kafaat_postgres_data:

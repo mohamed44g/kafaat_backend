@@ -1,0 +1,17 @@
+export enum ApiErrorCode {
+  ValidationFailed = 'VALIDATION_FAILED',
+  Unauthorized = 'UNAUTHORIZED',
+  Forbidden = 'FORBIDDEN',
+  ResourceNotFound = 'RESOURCE_NOT_FOUND',
+  Conflict = 'CONFLICT',
+  SubscriptionRequired = 'SUBSCRIPTION_REQUIRED',
+  RateLimitExceeded = 'RATE_LIMIT_EXCEEDED',
+  InternalError = 'INTERNAL_ERROR',
+  DatabaseUnavailable = 'DATABASE_UNAVAILABLE',
+  VideoProviderNotConfigured = 'VIDEO_PROVIDER_NOT_CONFIGURED',
+  VideoProviderUnavailable = 'VIDEO_PROVIDER_UNAVAILABLE',
+  InvalidWebhookSignature = 'INVALID_WEBHOOK_SIGNATURE',
+  LiveProviderNotConfigured = 'LIVE_PROVIDER_NOT_CONFIGURED',
+  LiveProviderUnavailable = 'LIVE_PROVIDER_UNAVAILABLE',
+  LiveSessionNotAvailable = 'LIVE_SESSION_NOT_AVAILABLE',
+}
