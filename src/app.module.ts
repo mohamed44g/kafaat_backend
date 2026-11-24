@@ -13,6 +13,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { ContentModule } from './content/content.module.js';
 import { HealthModule } from './health/health.module.js';
 import { SecurityModule } from './security/security.module.js';
+import { AuditInterceptor } from './security/audit.interceptor.js';
 import { UsersModule } from './users/users.module.js';
 import { ProgressModule } from './progress/progress.module.js';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
@@ -37,7 +38,10 @@ import { LiveSessionsModule } from './live-sessions/live-sessions.module.js';
             'req.headers.accesskey',
             'req.headers.x-bunnystream-signature',
             'req.body.password',
+            'req.body.code',
+            'req.body.challengeToken',
             'passwordHash',
+            'mfaSecretEncrypted',
             'jwt',
             'apiKey',
             'req.body.password',
@@ -66,6 +70,7 @@ import { LiveSessionsModule } from './live-sessions/live-sessions.module.js';
   providers: [
     GlobalExceptionFilter,
     ResponseInterceptor,
+    AuditInterceptor,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

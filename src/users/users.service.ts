@@ -14,6 +14,7 @@ export interface CreateUserInput {
 
 const userFields = `
   id::text AS "id", name, email, phone, password_hash AS "passwordHash",
+  mfa_secret_encrypted AS "mfaSecretEncrypted", mfa_enabled AS "mfaEnabled",
   role, is_subscribed AS "isSubscribed", subscription_ends_at AS "subscriptionEndsAt",
   avatar_url AS "avatarUrl", created_at AS "createdAt", updated_at AS "updatedAt"`;
 

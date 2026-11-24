@@ -29,6 +29,10 @@ export class DatabaseService implements OnModuleDestroy {
       connectionString: config.getOrThrow<string>('DATABASE_URL'),
       max: 10,
       idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 5_000,
+      statement_timeout: 15_000,
+      query_timeout: 20_000,
+      application_name: 'kafaat-api',
     });
   }
 

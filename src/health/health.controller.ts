@@ -3,12 +3,14 @@ import {
   Get,
   Header,
   ServiceUnavailableException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { DatabaseService } from '../database/database.service.js';
 import { MetricsService } from './metrics.service.js';
 import { RawResponse } from '../common/decorators/raw-response.decorator.js';
+import { MetricsAuthGuard } from './metrics-auth.guard.js';
 
 @ApiTags('health')
 @SkipThrottle()
@@ -43,6 +45,7 @@ export class HealthController {
   @Header('Content-Type', 'text/plain; version=0.0.4; charset=utf-8')
   @RawResponse()
   @ApiExcludeEndpoint()
+  @UseGuards(MetricsAuthGuard)
   metricsEndpoint() {
     return this.metrics.registry.metrics();
   }

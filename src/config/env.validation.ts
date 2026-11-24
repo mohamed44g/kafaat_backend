@@ -1,15 +1,38 @@
 type Environment = Record<string, string | undefined>;
 
 export function validateEnvironment(config: Environment): Environment {
-  const required = ['DATABASE_URL', 'JWT_SECRET'];
+  const required = ['DATABASE_URL', 'SESSION_HASH_PEPPER'];
   const missing = required.filter((key) => !config[key]);
   if (missing.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missing.join(', ')}`,
     );
   }
-  if ((config.JWT_SECRET?.length ?? 0) < 32) {
-    throw new Error('JWT_SECRET must contain at least 32 characters');
+  if ((config.SESSION_HASH_PEPPER?.length ?? 0) < 32) {
+    throw new Error('SESSION_HASH_PEPPER must contain at least 32 characters');
+  }
+  for (const key of ['SESSION_TTL_SECONDS', 'SESSION_IDLE_TIMEOUT_SECONDS']) {
+    const value = Number(
+      config[key] ?? (key === 'SESSION_TTL_SECONDS' ? 43200 : 3600),
+    );
+    if (!Number.isInteger(value) || value < 300 || value > 2_592_000)
+      throw new Error(`${key} must be an integer between 300 and 2592000`);
+  }
+  if (config.NODE_ENV === 'production') {
+    if ((config.MFA_ENCRYPTION_KEY?.length ?? 0) < 32)
+      throw new Error('MFA_ENCRYPTION_KEY must contain at least 32 characters');
+    if ((config.METRICS_TOKEN?.length ?? 0) < 32)
+      throw new Error('METRICS_TOKEN must contain at least 32 characters');
+    const origins = (config.CORS_ORIGINS ?? '').split(',').filter(Boolean);
+    if (!origins.length || origins.some((origin) => origin === '*'))
+      throw new Error(
+        'CORS_ORIGINS must be an explicit allowlist in production',
+      );
+    for (const origin of origins) {
+      const url = new URL(origin);
+      if (url.protocol !== 'https:')
+        throw new Error('Production CORS origins must use HTTPS');
+    }
   }
 
   const bunnyKeys = [

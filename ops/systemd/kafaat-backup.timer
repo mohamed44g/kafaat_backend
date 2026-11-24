@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily encrypted Kafaat PostgreSQL backup
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+Persistent=true
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target
+

@@ -1,0 +1,8 @@
+[Unit]
+Description=Encrypted Kafaat PostgreSQL backup
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/kafaat/backend/ops/backup-postgres.sh
+

@@ -3,7 +3,7 @@
 ## Conventions
 
 - Base URL: `/api/v1`
-- Authentication: `Authorization: Bearer <accessToken>`
+- Authentication: `Authorization: Bearer <opaqueSessionToken>`
 - IDs are decimal strings because PostgreSQL uses `bigint`.
 - Dates use ISO 8601 UTC strings.
 - Phone numbers use E.164, for example `+966501234567`.
@@ -35,11 +35,14 @@ Error response:
 | --- | --- | --- | --- |
 | POST | `/auth/register` | Public | Register with `name`, `email`, `phone`, `password` |
 | POST | `/auth/login` | Public | Login with `email`, `password` |
+| POST | `/auth/mfa/verify` | Admin pre-auth | Complete TOTP setup or verification |
+| POST | `/auth/logout` | User | Revoke the current session |
+| POST | `/auth/logout-all` | User | Revoke all sessions for the account |
 | GET | `/users/me` | User | Current profile |
 | PATCH | `/users/me` | User | Update `name`, `email`, `phone`, or `avatarUrl` |
 | GET | `/users` | Admin | Latest 100 users |
 
-Login and registration return `{ accessToken, tokenType, expiresIn, user }`. The Next.js frontend stores the access token in an `HttpOnly`, `SameSite=Lax` cookie and never in `localStorage`.
+Student login and registration return `{ accessToken, tokenType, expiresIn, user }`. The token is a random 256-bit opaque value; only its peppered SHA-256 hash is stored. Administrator login first returns an expiring MFA challenge, and the session is created only after `/auth/mfa/verify` succeeds. The Next.js BFF stores sessions in an `HttpOnly`, `Secure`, `SameSite=Strict` cookie and never in browser storage. Unsafe BFF calls require both a trusted `Origin` and a timing-safe double-submit CSRF token.
 
 ## Catalog
 
@@ -87,9 +90,10 @@ The webhook verifies the exact raw body with the library read-only key, rejects 
 | --- | --- | --- |
 | GET | `/health/live` | Process liveness |
 | GET | `/health/ready` | PostgreSQL readiness |
-| GET | `/metrics` | Prometheus metrics, unwrapped text |
-| GET | `/docs` | Swagger UI |
-| GET | `/docs/openapi.json` | Generated OpenAPI document |
+| GET | `/metrics` | Prometheus metrics; requires `Bearer <METRICS_TOKEN>` |
+| GET | `/docs` | Swagger UI; development only by default |
+| GET | `/docs/openapi.json` | OpenAPI document; development only by default |
+| GET | `/admin/security/audit-log` | Latest audit events; super admin only, cursor-paginated |
 
 ## Error codes
 

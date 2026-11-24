@@ -25,6 +25,7 @@ const migrations = [
   '004_bank_transfer_settings',
   '005_zoom_live_sessions',
   '006_jitsi_live_sessions',
+  '007_security_hardening',
 ];
 const pool = new PgPool({ connectionString: process.env.DATABASE_URL });
 const migrationPath = (name: string, down = false) =>

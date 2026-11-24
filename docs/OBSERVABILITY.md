@@ -4,13 +4,15 @@
 
 `nestjs-pino` emits JSON in production and readable single-line output in development. Every request receives or preserves `x-request-id`; the same value appears in responses, logs, and error envelopes.
 
-The logger redacts authorization headers, Bunny webhook signatures, passwords, password hashes, API keys, generated upload signatures, and Jitsi join JWTs. Do not log provider credentials or complete provider response bodies.
+The logger redacts authorization headers, Bunny webhook signatures, passwords, MFA codes and challenges, password hashes, MFA secrets, API keys, generated upload signatures, and Jitsi join JWTs. Do not log provider credentials or complete provider response bodies.
 
 ## Metrics and probes
 
 - `/api/v1/health/live`: restart only when this fails.
 - `/api/v1/health/ready`: remove instance from traffic when PostgreSQL fails.
-- `/api/v1/metrics`: Prometheus process metrics plus HTTP request count and duration.
+- `/api/v1/metrics`: Prometheus process metrics plus HTTP request count and duration. Supply `Authorization: Bearer <METRICS_TOKEN>`.
+
+Authentication and administrative operations are also written to the append-only application audit table. Super admins can read a bounded, cursor-paginated view at `/api/v1/admin/security/audit-log`; request bodies and secrets are never stored there.
 
 Recommended alerts: readiness failure for two minutes; HTTP 5xx over 2% for five minutes; p95 API latency over one second; unusual Bunny provider or webhook-signature failures; repeated `LIVE_PROVIDER_NOT_CONFIGURED`; missing completion webhook after an upload; PostgreSQL connection saturation or disk pressure. Monitor the Jitsi containers, UDP/10000 reachability, and room-join failures from browser telemetry separately.
 

@@ -1,0 +1,9 @@
+[Unit]
+Description=Kafaat backend readiness monitor
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/kafaat/monitoring.env
+ExecStart=/opt/kafaat/backend/ops/health-check.sh
+

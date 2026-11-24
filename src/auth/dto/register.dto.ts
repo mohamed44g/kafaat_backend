@@ -16,8 +16,12 @@ export class RegisterDto {
   @Matches(/^\+[1-9]\d{7,14}$/, { message: 'phone must use E.164 format' })
   phone: string;
 
-  @ApiProperty({ minLength: 8, example: 'StrongPassword123!' })
+  @ApiProperty({ minLength: 12, example: 'StrongPassword123!' })
   @IsString()
-  @Length(8, 128)
+  @Length(12, 128)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/, {
+    message:
+      'password must include uppercase, lowercase, number and special character',
+  })
   password: string;
 }

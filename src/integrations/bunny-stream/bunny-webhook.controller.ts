@@ -1,13 +1,13 @@
 import { Body, Controller, Headers, Post, Req } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { BunnyWebhookService } from './bunny-webhook.service.js';
 import { BunnyWebhookDto } from './dto/bunny-stream.dto.js';
 
 @ApiExcludeController()
-@SkipThrottle()
+@Throttle({ default: { limit: 120, ttl: 60_000 } })
 @Controller('webhooks/bunny')
 export class BunnyWebhookController {
   constructor(private readonly webhooks: BunnyWebhookService) {}

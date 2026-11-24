@@ -10,6 +10,8 @@ export interface User {
   email: string;
   phone: string;
   passwordHash: string;
+  mfaSecretEncrypted: string | null;
+  mfaEnabled: boolean;
   role: UserRole;
   isSubscribed: boolean;
   subscriptionEndsAt: Date | null;
