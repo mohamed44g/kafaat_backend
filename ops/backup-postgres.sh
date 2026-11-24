@@ -10,6 +10,7 @@ test -r "$BACKUP_ENV"
 # shellcheck disable=SC1090
 source "$BACKUP_ENV"
 : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY is required}"
+export BACKUP_ENCRYPTION_KEY
 
 install -d -m 0700 "$BACKUP_DIR"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"

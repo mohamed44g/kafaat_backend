@@ -10,6 +10,7 @@ test -r "$backup"
 # shellcheck disable=SC1090
 source "$BACKUP_ENV"
 : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY is required}"
+export BACKUP_ENCRYPTION_KEY
 
 database="kafaat_restore_check_$(date -u +%s)"
 cleanup() {
