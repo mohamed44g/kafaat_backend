@@ -36,8 +36,7 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (error: Error | null, allow?: boolean) => void,
     ) {
-      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-      else callback(new Error('Origin is not allowed by CORS'), false);
+      callback(null, !origin || allowedOrigins.includes(origin));
     },
     credentials: true,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
