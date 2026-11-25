@@ -16,7 +16,6 @@ import type { AuthUser } from '../common/interfaces/auth-user.interface.js';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
-import { VerifyMfaDto } from './dto/verify-mfa.dto.js';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -36,18 +35,6 @@ export class AuthController {
   @ApiOperation({ summary: 'Log in with email and password' })
   login(@Body() input: LoginDto, @Req() request: Request) {
     return this.authService.login(input, this.context(request));
-  }
-
-  @Post('mfa/verify')
-  @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
-  @ApiOperation({ summary: 'Complete administrator TOTP verification' })
-  verifyMfa(@Body() input: VerifyMfaDto, @Req() request: Request) {
-    return this.authService.verifyMfa(
-      input.challengeToken,
-      input.code,
-      this.context(request),
-    );
   }
 
   @Post('logout')

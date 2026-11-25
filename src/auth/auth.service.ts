@@ -9,8 +9,6 @@ import {
 import { UsersService } from '../users/users.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
-import { MfaService } from './mfa.service.js';
-import { UserRole } from '../users/entities/user.entity.js';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +17,6 @@ export class AuthService {
     private readonly db: DatabaseService,
     private readonly sessions: SessionService,
     private readonly audit: AuditService,
-    private readonly mfa: MfaService,
   ) {}
 
   async register(input: RegisterDto, context: SessionContext = {}) {
@@ -85,27 +82,7 @@ export class AuthService {
       attemptKey,
     ]);
     await this.recordLogin(email, context, 'success', null, user.id);
-    if ([UserRole.Admin, UserRole.SuperAdmin].includes(user.role))
-      return this.mfa.begin(user);
     return this.createSession(user, context);
-  }
-
-  async verifyMfa(
-    challengeToken: string,
-    code: string,
-    context: SessionContext = {},
-  ) {
-    const user = await this.mfa.verify(challengeToken, code);
-    await this.audit.record({
-      actorUserId: user.userId,
-      action: 'auth.mfa.verify',
-      outcome: 'success',
-      ipHash: context.ip ? this.sessions.hash(context.ip) : undefined,
-    });
-    return this.createSession(
-      { id: user.userId, name: user.name, email: user.email, role: user.role },
-      context,
-    );
   }
 
   async logout(token: string): Promise<{ loggedOut: true }> {

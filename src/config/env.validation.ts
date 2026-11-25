@@ -19,8 +19,6 @@ export function validateEnvironment(config: Environment): Environment {
       throw new Error(`${key} must be an integer between 300 and 2592000`);
   }
   if (config.NODE_ENV === 'production') {
-    if ((config.MFA_ENCRYPTION_KEY?.length ?? 0) < 32)
-      throw new Error('MFA_ENCRYPTION_KEY must contain at least 32 characters');
     if ((config.METRICS_TOKEN?.length ?? 0) < 32)
       throw new Error('METRICS_TOKEN must contain at least 32 characters');
     const origins = (config.CORS_ORIGINS ?? '').split(',').filter(Boolean);

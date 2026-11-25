@@ -15,6 +15,8 @@ reference audit that do not apply to the current product.
   uppercase, lowercase, numeric, and special characters.
 - Generic login failures, constant-work verification for unknown accounts,
   endpoint throttling, and a 15-minute lock after five failed attempts.
+- Administrator accounts currently use password authentication without MFA by
+  product decision; compensate with strong unique passwords and login auditing.
 - Deny-by-default RBAC on admin routes plus ownership-scoped queries for profile,
   progress, subscription, playback, and live-session access.
 - Parameterized PostgreSQL queries, global DTO validation with unknown fields

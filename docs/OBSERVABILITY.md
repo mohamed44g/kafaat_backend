@@ -4,7 +4,7 @@
 
 `nestjs-pino` emits JSON in production and readable single-line output in development. Every request receives or preserves `x-request-id`; the same value appears in responses, logs, and error envelopes.
 
-The logger redacts authorization headers, Bunny webhook signatures, passwords, MFA codes and challenges, password hashes, MFA secrets, API keys, generated upload signatures, and Jitsi join JWTs. Do not log provider credentials or complete provider response bodies.
+The logger redacts authorization headers, Bunny webhook signatures, passwords, password hashes, legacy MFA fields, API keys, generated upload signatures, and Jitsi join JWTs. Do not log provider credentials or complete provider response bodies.
 
 ## Metrics and probes
 

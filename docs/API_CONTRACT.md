@@ -35,18 +35,17 @@ Error response:
 
 ## Authentication and account
 
-| Method | Path               | Access         | Purpose                                            |
-| ------ | ------------------ | -------------- | -------------------------------------------------- |
-| POST   | `/auth/register`   | Public         | Register with `name`, `email`, `phone`, `password` |
-| POST   | `/auth/login`      | Public         | Login with `email`, `password`                     |
-| POST   | `/auth/mfa/verify` | Admin pre-auth | Complete TOTP setup or verification                |
-| POST   | `/auth/logout`     | User           | Revoke the current session                         |
-| POST   | `/auth/logout-all` | User           | Revoke all sessions for the account                |
-| GET    | `/users/me`        | User           | Current profile                                    |
-| PATCH  | `/users/me`        | User           | Update `name`, `email`, `phone`, or `avatarUrl`    |
-| GET    | `/users`           | Admin          | Latest 100 users                                   |
+| Method | Path               | Access | Purpose                                            |
+| ------ | ------------------ | ------ | -------------------------------------------------- |
+| POST   | `/auth/register`   | Public | Register with `name`, `email`, `phone`, `password` |
+| POST   | `/auth/login`      | Public | Login with `email`, `password`                     |
+| POST   | `/auth/logout`     | User   | Revoke the current session                         |
+| POST   | `/auth/logout-all` | User   | Revoke all sessions for the account                |
+| GET    | `/users/me`        | User   | Current profile                                    |
+| PATCH  | `/users/me`        | User   | Update `name`, `email`, `phone`, or `avatarUrl`    |
+| GET    | `/users`           | Admin  | Latest 100 users                                   |
 
-Student login and registration return `{ accessToken, tokenType, expiresIn, user }`. The token is a random 256-bit opaque value; only its peppered SHA-256 hash is stored. Administrator login first returns an expiring MFA challenge, and the session is created only after `/auth/mfa/verify` succeeds. The Next.js BFF stores sessions in an `HttpOnly`, `Secure`, `SameSite=Strict` cookie and never in browser storage. Unsafe BFF calls require both a trusted `Origin` and a timing-safe double-submit CSRF token.
+Login and registration return `{ accessToken, tokenType, expiresIn, user }`. The token is a random 256-bit opaque value; only its peppered SHA-256 hash is stored. Administrators and students both authenticate with email and password. The Next.js BFF stores sessions in an `HttpOnly`, `Secure`, `SameSite=Strict` cookie and never in browser storage. Unsafe BFF calls require both a trusted `Origin` and a timing-safe double-submit CSRF token.
 
 ## Catalog
 
