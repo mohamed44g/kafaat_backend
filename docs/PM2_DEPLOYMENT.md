@@ -28,6 +28,29 @@ pm2 save
 
 تم تفعيل خدمة `pm2-kafaat` في systemd؛ لذلك ستعود التطبيقات تلقائياً بعد إعادة تشغيل الـVPS.
 
+## إعداد Nginx لصور الكورسات
+
+أضف داخل كتلة HTTPS الخاصة بـ `kafaat-academy.com` ثم نفّذ `nginx -t` قبل إعادة التحميل:
+
+```nginx
+client_max_body_size 6m;
+
+location ^~ /api/v1/uploads/ {
+    proxy_pass http://127.0.0.1:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+المسار `/opt/kafaat/backend/uploads` بيانات تشغيل دائمة وليس جزءاً من Git؛ أضفه إلى النسخ الاحتياطي مع قاعدة البيانات.
+
 ## إدارة الخدمات
 
 ```bash
