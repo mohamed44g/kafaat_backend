@@ -38,7 +38,8 @@ reference audit that do not apply to the current product.
   manually approved after bank transfer. Activation remains a super-admin-only
   operation and is audited.
 - Email verification, password reset OTP, and public file uploads do not exist
-  yet. Their controls must be added before those features are introduced.
+  yet. Course cover uploads are admin-only, size/rate limited, signature checked,
+  re-encoded to WebP without metadata, and stored under random UUID filenames.
 - Jitsi is self-hosted; Zoom OAuth and Meeting SDK controls are no longer part of
   the active architecture.
 

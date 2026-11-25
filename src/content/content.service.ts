@@ -20,6 +20,7 @@ import {
   UpdateInstructorDto,
   UpdateVideoDto,
 } from './dto/content.dto.js';
+import { CourseImageService } from './course-image.service.js';
 
 const categoryFields = `id::text AS "id", title, created_at AS "createdAt"`;
 const instructorFields = `id::text AS "id", name, bio, avatar_url AS "avatarUrl", created_at AS "createdAt"`;
@@ -32,6 +33,7 @@ export class ContentService {
     private readonly db: DatabaseService,
     private readonly bunny: BunnyStreamService,
     private readonly bunnyWebhooks: BunnyWebhookService,
+    private readonly courseImages: CourseImageService,
   ) {}
 
   async listCategories(): Promise<Category[]> {
@@ -43,7 +45,7 @@ export class ContentService {
   }
   async createCategory(input: CreateCategoryDto): Promise<Category> {
     return this.require(
-      this.one(
+      this.one<Category>(
         `INSERT INTO categories (title) VALUES ($1) RETURNING ${categoryFields}`,
         [input.title],
       ),
@@ -146,8 +148,15 @@ export class ContentService {
     );
   }
   async updateCourse(id: string, input: UpdateCourseDto): Promise<Course> {
-    return this.require(
-      this.one(
+    const previous = await this.require(
+      this.one<{ thumbnailUrl: string | null }>(
+        `SELECT thumbnail_url AS "thumbnailUrl" FROM courses WHERE id=$1`,
+        [id],
+      ),
+      'Course',
+    );
+    const course = await this.require(
+      this.one<Course>(
         `UPDATE courses SET slug=COALESCE($2,slug), title=COALESCE($3,title), description=COALESCE($4,description), thumbnail_url=COALESCE($5,thumbnail_url), is_published=COALESCE($6,is_published), instructor_id=COALESCE($7,instructor_id), category_id=COALESCE($8,category_id) WHERE id=$1 RETURNING ${courseFields.replaceAll('c.', '')}`,
         [
           id,
@@ -162,13 +171,45 @@ export class ContentService {
       ),
       'Course',
     );
+    if (
+      input.thumbnailUrl &&
+      previous.thumbnailUrl &&
+      input.thumbnailUrl !== previous.thumbnailUrl
+    )
+      await this.courseImages.removeByPublicUrl(previous.thumbnailUrl);
+    return course;
   }
   async removeCourse(id: string) {
-    await this.require(
-      this.one(`DELETE FROM courses WHERE id = $1 RETURNING id`, [id]),
+    const removed = await this.require(
+      this.one<{ id: string; thumbnailUrl: string | null }>(
+        `DELETE FROM courses WHERE id = $1 RETURNING id::text AS "id", thumbnail_url AS "thumbnailUrl"`,
+        [id],
+      ),
       'Course',
     );
+    await this.courseImages.removeByPublicUrl(removed.thumbnailUrl);
     return { deleted: true };
+  }
+
+  async removeUnattachedCourseImage(filename: string) {
+    const publicUrl = this.courseImages.publicUrl(filename);
+    if (!publicUrl)
+      throw new AppException(
+        ApiErrorCode.ValidationFailed,
+        'Invalid course image name',
+        HttpStatus.BAD_REQUEST,
+      );
+    const attached = await this.one<{ exists: boolean }>(
+      `SELECT EXISTS(SELECT 1 FROM courses WHERE thumbnail_url=$1) AS "exists"`,
+      [publicUrl],
+    );
+    if (attached?.exists)
+      throw new AppException(
+        ApiErrorCode.Conflict,
+        'The course image is still in use',
+        HttpStatus.CONFLICT,
+      );
+    return { deleted: await this.courseImages.remove(filename) };
   }
 
   async createVideo(courseId: string, input: CreateVideoDto): Promise<Video> {

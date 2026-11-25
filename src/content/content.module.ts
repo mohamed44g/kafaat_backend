@@ -6,6 +6,7 @@ import { ContentService } from './content.service.js';
 import { BunnyStreamModule } from '../integrations/bunny-stream/bunny-stream.module.js';
 import { SubscriptionGuard } from '../common/guards/subscription.guard.js';
 import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard.js';
+import { CourseImageService } from './course-image.service.js';
 
 @Module({
   imports: [BunnyStreamModule],
@@ -16,6 +17,7 @@ import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard.j
     OptionalJwtAuthGuard,
     RolesGuard,
     SubscriptionGuard,
+    CourseImageService,
   ],
   exports: [ContentService],
 })

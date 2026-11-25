@@ -8,9 +8,9 @@ services:
     volumes:
       - kafaat_postgres_data:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:5432:5432"
+      - '127.0.0.1:5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
       interval: 5s
       timeout: 5s
       retries: 20
@@ -25,7 +25,9 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3001:3001"
+      - '127.0.0.1:3001:3001'
+    volumes:
+      - kafaat_course_uploads:/app/uploads
     networks: [private]
 
   frontend:
@@ -37,7 +39,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'
     networks: [private]
 
 networks:
@@ -46,3 +48,4 @@ networks:
 
 volumes:
   kafaat_postgres_data:
+  kafaat_course_uploads:

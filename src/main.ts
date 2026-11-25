@@ -9,6 +9,7 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter.
 import { ResponseInterceptor } from './common/interceptors/response.interceptor.js';
 import { MetricsInterceptor } from './health/metrics.interceptor.js';
 import { AuditInterceptor } from './security/audit.interceptor.js';
+import { join, resolve } from 'node:path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -27,6 +28,24 @@ async function bootstrap() {
       crossOriginResourcePolicy: { policy: 'same-site' },
     }),
   );
+  const uploadDirectory = resolve(
+    process.env.UPLOAD_DIR ?? join(process.cwd(), 'uploads'),
+  );
+  app.useStaticAssets(uploadDirectory, {
+    prefix: '/api/v1/uploads/',
+    dotfiles: 'deny',
+    index: false,
+    maxAge: '1y',
+    immutable: true,
+    setHeaders(response) {
+      response.setHeader(
+        'Cache-Control',
+        'public, max-age=31536000, immutable',
+      );
+      response.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+      response.setHeader('X-Content-Type-Options', 'nosniff');
+    },
+  });
   const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
     .split(',')
     .map((origin) => origin.trim())

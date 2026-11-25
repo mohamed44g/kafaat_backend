@@ -101,6 +101,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   private codeFromStatus(status: number): ApiErrorCode {
     if (status === 400) return ApiErrorCode.ValidationFailed;
+    if (status === 413) return ApiErrorCode.ValidationFailed;
     if (status === 401) return ApiErrorCode.Unauthorized;
     if (status === 403) return ApiErrorCode.Forbidden;
     if (status === 404) return ApiErrorCode.ResourceNotFound;

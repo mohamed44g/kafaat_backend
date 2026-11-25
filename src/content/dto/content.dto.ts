@@ -45,7 +45,9 @@ export class CreateCourseDto {
   @ApiProperty() @IsString() @Length(10, 10000) description: string;
   @ApiPropertyOptional()
   @IsOptional()
-  @IsUrl({ require_protocol: true })
+  @Matches(
+    /^\/api\/v1\/uploads\/courses\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp$/,
+  )
   thumbnailUrl?: string;
   @ApiProperty() @IsString() categoryId: string;
   @ApiProperty() @IsString() instructorId: string;

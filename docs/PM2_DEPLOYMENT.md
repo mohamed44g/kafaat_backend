@@ -10,6 +10,10 @@
 cd /opt/kafaat/backend && git pull && npm ci && npm run build
 cd /opt/kafaat/frontend && git pull && npm ci && npm run build
 
+# صور الكورسات تُحفظ هنا ويجب تضمين المجلد في النسخ الاحتياطي
+mkdir -p /opt/kafaat/backend/uploads/courses
+chmod 750 /opt/kafaat/backend/uploads /opt/kafaat/backend/uploads/courses
+
 # Next standalone لا ينسخ public و static تلقائياً
 cd /opt/kafaat/frontend
 rm -rf .next/standalone/public .next/standalone/.next/static

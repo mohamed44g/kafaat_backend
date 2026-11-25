@@ -7,9 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
+import { memoryStorage } from 'multer';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -18,6 +23,10 @@ import { SubscriptionGuard } from '../common/guards/subscription.guard.js';
 import { CreateVideoUploadSessionDto } from '../integrations/bunny-stream/dto/bunny-stream.dto.js';
 import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard.js';
 import { ContentService } from './content.service.js';
+import {
+  COURSE_IMAGE_MAX_BYTES,
+  CourseImageService,
+} from './course-image.service.js';
 import {
   CreateCategoryDto,
   CreateCourseDto,
@@ -32,7 +41,10 @@ import {
 @ApiTags('catalog')
 @Controller()
 export class ContentController {
-  constructor(private readonly content: ContentService) {}
+  constructor(
+    private readonly content: ContentService,
+    private readonly courseImages: CourseImageService,
+  ) {}
 
   @Get('categories')
   @ApiOperation({ summary: 'List course categories' })
@@ -131,6 +143,31 @@ export class ContentController {
   @Roles(UserRole.Admin, UserRole.SuperAdmin)
   removeCourse(@Param('id') id: string) {
     return this.content.removeCourse(id);
+  }
+
+  @Post('admin/course-images')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin, UserRole.SuperAdmin)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: { files: 1, fileSize: COURSE_IMAGE_MAX_BYTES, fields: 0 },
+    }),
+  )
+  @ApiOperation({ summary: 'Upload and sanitize a course cover image' })
+  uploadCourseImage(@UploadedFile() image?: Express.Multer.File) {
+    return this.courseImages.store(image);
+  }
+
+  @Delete('admin/course-images/:filename')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin, UserRole.SuperAdmin)
+  @ApiOperation({ summary: 'Remove an unattached course cover image' })
+  removeCourseImage(@Param('filename') filename: string) {
+    return this.content.removeUnattachedCourseImage(filename);
   }
 
   @Post('admin/courses/:courseId/videos')
